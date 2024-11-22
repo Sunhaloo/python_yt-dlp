@@ -18,13 +18,17 @@ def create_folder() -> str:
 def main():
     user_url = input("\nPlease Enter YouTube URL: ")
 
-    print("\nCreating Output Folder\n")
     path = create_folder()
+
     file_name = os.path.join(path + "/%(title)s.%(ext)s")
 
     yt_audio_cmd = ["yt-dlp", user_url, "--format", "m4a", "-o", file_name]
+    yt_audio_cmd_2 = ["yt-dlp", user_url, "--format", "bestaudio", "--extract-audio", "--audio-format", "m4a", "-o", file_name]
     # run the command in shell
+    # NOTE: thinking of using this command
     subprocess.run(yt_audio_cmd)
+    # NOTE: its good this one, but it needs to delete the .webm file... one more step
+    # subprocess.run(yt_audio_cmd_2)
 
 
 
