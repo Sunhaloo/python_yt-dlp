@@ -66,6 +66,37 @@ def create_folder(user_option: str):
             os.mkdir(os.path.expanduser("~/Desktop/downloaded_video"))
 
 
+# function to check if text file containing URLs actually contains something
+# NOTE: this is how I would do it!
+def check_file_size_open_file(file_path: str):
+    # exception handling
+    try:
+        # open the file in read mode
+        with open(file_path, 'r') as txt_file:
+            # read the first line of the text file
+            first_line = txt_file.readlines(1)
+
+            # output appropriate message based on contents of text file
+            if not first_line:
+                print("WARNING: The Text File Does Not Contain Any URLs")
+
+
+    except FileNotFoundError as e:
+        # split the path of file into a list
+        path_split = file_path.split("/")
+        # get the last value of the list
+        file_name = path_split[len(path_split) - 1]
+
+        print(f"\nError: {e}")
+        print(f"File '{file_name}' Has NOT Been Found at Desktop!!!")
+
+
+
+# INFO: This is the better version
+def check_file_size():
+    raise NotImplementedError
+
+
 # function to allow the user to convert YouTube videos to audio
 # NOTE: for now the downloader will be very simple
 def audio_downloader():
@@ -163,9 +194,11 @@ def main():
     # call function to display options to user
     display_options()
 
+    check_file_size_open_file("/home/azman/GitHub/python_yt-dlp/test.txt")
+
     # ask the user to enter his choice
     # user_option = input("Please Select an Option: ")
-    audio_downloader()
+    # audio_downloader()
 
     # call the function to evaluate the user's choice
     # evaluate_choice(user_option)
