@@ -131,7 +131,9 @@ def check_file_size(file_path: str):
 
 
 # function to convert `.m4a` files to `.mp3`
-def convert_to_mp3(directory_path: str, bitrate: int):
+def convert_to_mp3(directory_path: str, bitrate: str):
+    # change from current working directory to where we downloaded the songs
+    os.chdir(directory_path)
     # iterate through the whole directory / folder
     for song in os.listdir(directory_path):
         # get each song's name
@@ -172,12 +174,16 @@ def audio_downloader():
     # ask the user to enter an option
     user_option = input("Please Select an Option: ")
 
+    print_dashed_line()
+
     # evaluate user's option
     if user_option == "1":
         # user wants to only convert 1 YouTube video
         pass
 
     elif user_option == "2":
+
+        print("Converting URLs from Text File\n")
         # user wants to convert a list of URLs with text file
         '''
         WARNING:
@@ -186,7 +192,8 @@ def audio_downloader():
                 2. Text File **need** to be located at '~/Desktop'
         '''
         # directory and output format for downloaded songs
-        output_file_path = os.path.join(os.path.expanduser("~/Desktop/downloaded_audio") + "/%(title)s.%(ext)s")
+        output_path = os.path.expanduser("~/Desktop/downloaded_audio")
+        output_file_name = os.path.join(os.path.expanduser("~/Desktop/downloaded_audio") + "/%(title)s.%(ext)s")
         # input file for the YouTube URLs
         text_file = os.path.expanduser("~/Desktop/yt_urls.txt")
 
@@ -205,7 +212,7 @@ def audio_downloader():
                     "--format",
                     "m4a",
                     "-o",
-                    output_file_path
+                    output_file_name
                 ]
 
             # run the command from Python
@@ -216,6 +223,20 @@ def audio_downloader():
             print_dashed_line()
             print("You have no 'yt_urls.txt' File!!!")
             print_dashed_line()
+
+        # start the convertion process
+
+        print_dashed_line()
+        print("Starting Conversion Process\n")
+        user_bitrate = input("\nPlease Enter Birate: ")
+        actual_birate = user_bitrate + "k"
+
+        print_dashed_line()
+
+        # call the function to convert from m4a to mp3
+        # NOTE: I plan to add other conversion formats like `.wav`
+        # cannot do that right now because I don't understand ffmpeg
+        convert_to_mp3(output_path, actual_birate)
 
     elif user_option == "3":
         # user wants to exit
@@ -229,7 +250,6 @@ def audio_downloader():
         print_dashed_line()
         print('Wrong Option')
         print_dashed_line()
-
 
 
 # function to download the YouTube video itself
