@@ -78,23 +78,54 @@ def check_file_size_open_file(file_path: str):
 
             # output appropriate message based on contents of text file
             if not first_line:
-                print("WARNING: The Text File Does Not Contain Any URLs")
+                print_dashed_line()
+                print("The Text File Does NOT Contain Any URLs\nExiting!!!")
+                print_dashed_line()
 
-
+    # if file has not been found
     except FileNotFoundError as e:
+        # NOTE: extracting the file name in the `except` part
+        # so that it does not run if the text file has stuff in it ( innit )
+
         # split the path of file into a list
         path_split = file_path.split("/")
         # get the last value of the list
         file_name = path_split[len(path_split) - 1]
 
+        # output appropriate message
         print(f"\nError: {e}")
         print(f"File '{file_name}' Has NOT Been Found at Desktop!!!")
 
 
+# INFO: This is the better version for checking the file size
+def check_file_size(file_path: str):
+    # exception handling
+    try:
+        # get the size of the file in question
+        txt_file_size = os.path.getsize(file_path)
 
-# INFO: This is the better version
-def check_file_size():
-    raise NotImplementedError
+        # output appropriate message based on size of text file
+        # NOTE: this method `.getsize()` return size in bytes
+        if txt_file_size == 0:
+            # meaning that we have nothing in the file
+            print_dashed_line()
+            print("The Text File Does NOT Contains Any URLs\nExiting!!!")
+            print_dashed_line()
+
+    # if file has not been found
+    except FileNotFoundError as e:
+        # NOTE: extracting the file name in the `except` part
+        # so that it does not run if the text file has stuff in it ( innit )
+
+        # split the path of file into a list
+        path_split = file_path.split("/")
+        # get the last value of the list
+        file_name = path_split[len(path_split) - 1]
+
+        # output appropriate message
+        print(f"\nError: {e}")
+        print(f"File '{file_name}' Has NOT Been Found at Desktop!!!")
+    
 
 
 # function to allow the user to convert YouTube videos to audio
@@ -194,7 +225,8 @@ def main():
     # call function to display options to user
     display_options()
 
-    check_file_size_open_file("/home/azman/GitHub/python_yt-dlp/test.txt")
+    check_file_size_open_file("/home/azman/GitHub/python_yt-dlp/test.py")
+    check_file_size("/home/azman/GitHub/python_yt-dlp/test.py")
 
     # ask the user to enter his choice
     # user_option = input("Please Select an Option: ")
