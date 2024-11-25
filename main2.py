@@ -158,6 +158,9 @@ def audio_downloader():
                 1. Text File **need** to have a name of 'yt_urls.txt'
                 2. Text File **need** to be located at '~/Desktop'
         '''
+        # directory and output format for downloaded songs
+        output_file_path = os.path.join(os.path.expanduser("~/Desktop/downloaded_audio") + "/%(title)s.%(ext)s")
+        # input file for the YouTube URLs
         text_file = os.path.expanduser("~/Desktop/yt_urls.txt")
 
         # before we continue with anything... check if file 'yt_urls.txt' exists
@@ -166,7 +169,19 @@ def audio_downloader():
             check_file_size(text_file)
 
             # everything is good ==> file present and size of file is greater than 0
-            # ==> start the downloading process
+            # ==> start the downloading process --> with subprocess module
+            yt_dlp_cmd = [
+                    "yt-dlp",
+                    "-a",
+                    text_file,
+                    "--format",
+                    "m4a",
+                    "-o",
+                    output_file_path
+                ]
+
+            # run the command from Python
+            subprocess.run(yt_dlp_cmd)
 
         else:
             # user does not have 'yt_urls.txt' file present at `~/Desktop`
