@@ -38,8 +38,9 @@ def main():
     os.chdir(os.path.expanduser("~/Desktop/downloaded_audio/"))
     for item in os.listdir():
         input_file = item
-        file_name_wo_ext = os.path.splitext(item)[0]
-        output_file = os.path.join(file_name_wo_ext + ".mp3")
+        # file_name_wo_ext = os.path.splitext(item)[0]
+        output_file = os.path.splitext(item)[0]
+        # output_file = os.path.join(file_name_wo_ext + "shit")
 
         # ffmpeg_mp3_cmd = ["ffmpeg", "-i", input_file, "-vn", "-acodec", "libmp3lame", "-q:a", "0", "-ar", "44100", "-y", output_file]
         # ffmpeg_mp3_cmd = ["ffmpeg", "-i", input_file, "-vn", "-acodec", "libmp3lame", "-ab", "192k", "-ar", "44100", "-y", output_file]

@@ -128,7 +128,34 @@ def check_file_size(file_path: str):
         # output appropriate message
         print(f"\nError: {e}")
         print(f"File '{file_name}' Has NOT Been Found at Desktop!!!")
-    
+
+
+# function to convert `.m4a` files to `.mp3`
+def convert_to_mp3(directory_path: str, bitrate: int):
+    # iterate through the whole directory / folder
+    for song in os.listdir(directory_path):
+        # get each song's name
+        input_song = song
+        # find the name of the song without extension ( ==> NO `.m4a` )
+        output_song = os.path.splitext(input_song)[0]
+
+        # arguments to pass through ffmpeg
+        ffmpeg_cmd = [
+            "ffmpeg", 
+            "-i", input_song, 
+            "-vn", 
+            "-acodec", "libmp3lame", 
+            "-ab", bitrate, 
+            "-ar", "44100", 
+            "-f", "mp3",
+            "-y",
+            output_song
+            ]
+
+        # run command from Python
+        subprocess.run(ffmpeg_cmd)
+        # clean the `.m4a` file
+        os.remove(input_song)
 
 
 # function to allow the user to convert YouTube videos to audio
@@ -170,6 +197,7 @@ def audio_downloader():
 
             # everything is good ==> file present and size of file is greater than 0
             # ==> start the downloading process --> with subprocess module
+            # arguments to pass through yt-dlp
             yt_dlp_cmd = [
                     "yt-dlp",
                     "-a",
