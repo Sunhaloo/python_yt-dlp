@@ -13,7 +13,7 @@ def print_dashed_line():
 # depending if downloading audio / video; will create folder with respective name
 def create_folder(user_option: str):
     # check for the user's option
-    if user_option == "1":
+    if user_option == "audio":
         # meaning user wants to download audio
         dir_path = os.path.expanduser("~/Desktop/downloaded_audio")
 
@@ -31,7 +31,7 @@ def create_folder(user_option: str):
             # create the directory / folder
             os.mkdir(os.path.expanduser("~/Desktop/downloaded_audio"))
 
-    elif user_option == "2":
+    elif user_option == "video":
         # meaning user wants to download audio
         dir_path = os.path.expanduser("~/Desktop/downloaded_video")
 
@@ -97,7 +97,7 @@ def convert_audio_format(directory_path: str, file_format: str, bitrate: str):
     else:
         # if the user enters something else
         print_dashed_line()
-        print("<-- Invalid File Format Entered... Defaulting to MP3 -->")
+        print("<-- Invalid File Format Entered... Defaulting to MP3 and Using Default Bitrate -->")
         file_format = "mp3"
         codec = "libmp3lame"
         print_dashed_line()
@@ -140,23 +140,71 @@ def audio_downloader():
 
     # prompt the user select an option
     user_option = input("\n\nPlease Select An Option: ")
-    print_dashed_line()
 
     # evalute the user's option
     if user_option == "1":
         # user wants to only convert 1 YouTube link / video
-        pass
+        print("<-- Converting A Single URL -->")
+        print_dashed_line()
+
+        # variable to hold the output directory / path
+        output_path = os.path.expanduser("~/Desktop/")
+        # variable to hold the output "filename" for the downloaded songs
+        output_song_name = os.path.join(output_path + "%(title)s.%(ext)s")
+
+        # prompt the user to enter the YouTube URL
+        # NOTE: Remember to write function to check if url is valid
+        yt_url = input("Please Enter YouTube URL to Convert: ")
+
+
+        # command to execute from Python in shell
+        yt_dlp_cmd = [
+                "yt-dlp",
+                yt_url,
+                "--format", "m4a",
+                "-o", output_song_name
+            ]
+
+        print()
+
+        # run the command from Python to the Terminal
+        subprocess.run(yt_dlp_cmd)
+
+        print_dashed_line()
+        print("<-- Starting Conversion Process -->\n")
+
+        # prompt the user to enter file_format and bitrate
+        user_format = input("Please Select Between 'mp3' and 'wav': ")
+        user_bitrate = input("Please Enter Bit Rate ( 100 - 2000 ): ")
+
+        print_dashed_line()
+
+        # perform check on bitrate
+        if (int(user_bitrate) >= 100 or int(user_bitrate) <= 2000):
+            # everything is good... use user's bitrate
+            actual_bitrate = user_bitrate + "k"
+        
+        else:
+            # BUG: Problem here
+            # user did not enter bitrate in range
+            print("Invalid Range For Bitrate... Defaulting to 192k")
+            actual_bitrate = "192k"
+        
+        # call the function to convert to required audio format
+        convert_audio_format(output_path, user_format, actual_bitrate)
     
     elif user_option == "2":
         # user wants to convert YouTube links / videos with Text File
         print_dashed_line()
         print("<-- Converting URLs from Text File -->")
-        print_dashed_line()
+
+        # call the function to create the output directory
+        create_folder("audio")
 
         # variable to hold the output directory / path
-        output_path = os.path.expanduser("~/Desktop/downloaded_audio")
+        output_path = os.path.expanduser("~/Desktop/downloaded_audio/")
         # variable to hold the output "filename" for the downloaded songs
-        output_song_name = os.path.join(output_path + "/%(title)s.%(ext)s")
+        output_song_name = os.path.join(output_path + "%(title)s.%(ext)s")
         # directory / path for our input file
         text_file = os.path.expanduser("~/Desktop/yt_urls.txt")
 
@@ -179,19 +227,28 @@ def audio_downloader():
             # run the command from Python to the Terminal
             subprocess.run(yt_dlp_cmd)
 
-            # WARNING: This has not been tested
             print_dashed_line()
             print("<-- Starting Conversion Process -->")
             print_dashed_line()
 
             # prompt the user to enter file_format and bitrate
             user_format = input("Please Select Between 'mp3' and 'wav': ")
-            user_bitrate = input("Please Enter Bit Rate: ")
-            actual_bitrate = user_bitrate + "k"
+            user_bitrate = input("Please Enter Bit Rate ( 100 - 2000 ): ")
+
+            # perform check on bitrate
+            if (int(user_bitrate) >= 100 or int(user_bitrate) <= 2000):
+                # everything is good... use user's bitrate
+                actual_bitrate = user_bitrate + "k"
+            
+            else:
+                # BUG: Problem here
+                # user did not enter bitrate in range
+                print("Invalid Range For Bitrate... Defaulting to 192k")
+                actual_bitrate = "192k"
 
             print_dashed_line()
 
-            # call the function to convert audio format
+            # call the function to convert to required audio format
             convert_audio_format(output_path, user_format, actual_bitrate)
 
         else:
