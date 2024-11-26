@@ -175,6 +175,7 @@ def audio_downloader():
         if user_option == "1":
             # user wants to only convert 1 YouTube link / video
             print("\n<-- Converting A Single URL -->")
+            print_dashed_line()
 
             # call the function to create the output directory / folder
             create_folder("audio")
@@ -205,14 +206,10 @@ def audio_downloader():
             print_dashed_line()
             print("<-- Starting Conversion Process -->\n\n")
 
-            # prompt the user to enter file_format and bitrate
-            user_format = input("Please Select Between 'mp3' and 'wav': ")
-            user_bitrate = int(input("Please Enter Bit Rate ( 100 - 2000 ): "))
-
             # call the function to return the codec and bitrate to main program
             file_format, current_codec, actual_bitrate = file_bitrate_checker()
             
-            print(f"<-- Converting to {file_format} -->\n\n")
+            print(f"<-- Converting to '{file_format}' -->\n\n")
 
             # call the function to convert to required audio format
             # convert_audio_format_single(output_path, user_format, actual_bitrate)
@@ -261,7 +258,7 @@ def audio_downloader():
                 # call the function to return the codec and bitrate to main program
                 file_format, current_codec, actual_bitrate = file_bitrate_checker()
 
-                print(f"<-- Converting to {file_format} -->\n\n")
+                print(f"<-- Converting to '{file_format}' -->\n\n")
 
                 # call the function to convert to required audio format
                 convert_audio_format(output_path, file_format, actual_bitrate, current_codec)
@@ -290,11 +287,6 @@ def audio_downloader():
     except ValueError as e:
         print(f"\nError: {e}")
         print("Please Enter Integer Data for Bitrate\n")
-
-
-
-
-audio_downloader()
 
 
 
