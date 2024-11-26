@@ -25,7 +25,6 @@ def create_folder(user_option: str):
 
         # if the directory / folder does not exists
         else:
-            print_dashed_line()
             print("<-- Creating Output Folder -->")
             print_dashed_line()
             # create the directory / folder
@@ -42,7 +41,6 @@ def create_folder(user_option: str):
 
         # if the directory / folder does not exists
         else:
-            print_dashed_line()
             print("<-- Creating Output Folder -->")
             print_dashed_line()
             # create the directory / folder
@@ -83,70 +81,58 @@ def check_file_size(file_path: str):
 
 
 # function to validate file_format and bitrate
-def file_bitrate_checker(file_format: str, bitrate: int):
+def file_bitrate_checker():
     # exception handling
     try:
+        # prompt the user to enter file format + bitrate
+        user_format = input("Please Select Between 'mp3' and 'wav': ")
+        user_bitrate = int(input("Please Enter Bit Rate ( 100 - 2000 ): "))
+
         # evaluate the file format and codecs
-        if file_format == "mp3":
+        if user_format == "mp3":
+            # to return the file format
+            file_format = "mp3"
             # use the appropriate codec for mp3
             codec = "libmp3lame"
 
-        elif file_format == "wav":
+        elif user_format == "wav":
+            # to return the file format
+            file_format = "wav"
             # use the appropriate codec for wav
             codec = "pcm_s16le"
 
         else:
             # if the user enters something else
             print_dashed_line()
-            print("<-- Invalid File Format Entered... Defaulting to MP3 and Using Default Bitrate -->")
+            print("<-- Invalid File Format Entered... Defaulting to MP3 -->")
             file_format = "mp3"
             codec = "libmp3lame"
 
-        print_dashed_line()
-
         # perform check on bitrate
-        if (bitrate >= 100 and bitrate <= 2000):
+        if (user_bitrate >= 100 and user_bitrate <= 2000):
             # everything is good... use user's bitrate
-            actual_bitrate = str(bitrate) + "k"
+            actual_bitrate = str(user_bitrate) + "k"
         
             print_dashed_line()
 
         else:
-            print("Invalid Range For Bitrate... Defaulting to 192k")
+            print("<-- Invalid Range For Bitrate... Defaulting to 192k -->")
             actual_bitrate = "192k"
 
             print_dashed_line()
 
         # return the codec and bitrate to main program
-        return codec, actual_bitrate
+        return file_format, codec, actual_bitrate
 
     # if the user does not enter integer values for bitrate
     except ValueError as e:
         print(f"\nError: {e}")
         print("Please Enter Integer Value for Bitrate\n")
-        return "libmp3lame", "192k"
+        return "mp3", "libmp3lame", "192k"
 
 
 # function to convert between audio formats
 def convert_audio_format(directory_path: str, file_format: str, bitrate: str, codec: str):
-    # # evaluate the file format and codecs
-    # if file_format == "mp3":
-    #     # use the appropriate codec for mp3
-    #     codec = "libmp3lame"
-    #
-    # elif file_format == "wav":
-    #     # use the appropriate codec for wav
-    #     codec = "pcm_s16le"
-    #
-    # else:
-    #     # if the user enters something else
-    #     print_dashed_line()
-    #     print("<-- Invalid File Format Entered... Defaulting to MP3 and Using Default Bitrate -->")
-    #     file_format = "mp3"
-    #     codec = "libmp3lame"
-    #
-    # print_dashed_line()
-
     # change from the current working directory to where we downloaded the songs
     os.chdir(directory_path)
     # iterate through the whole directory / folder
@@ -189,7 +175,6 @@ def audio_downloader():
         if user_option == "1":
             # user wants to only convert 1 YouTube link / video
             print("\n<-- Converting A Single URL -->")
-            print_dashed_line()
 
             # call the function to create the output directory / folder
             create_folder("audio")
@@ -224,27 +209,14 @@ def audio_downloader():
             user_format = input("Please Select Between 'mp3' and 'wav': ")
             user_bitrate = int(input("Please Enter Bit Rate ( 100 - 2000 ): "))
 
-            # TESTING: Testing file and bitrate checker
-            current_codec, actual_bitrate = file_bitrate_checker(user_format, user_bitrate)
-
-            # perform check on bitrate
-            # if (user_bitrate >= 100 and user_bitrate <= 2000):
-            #     # everything is good... use user's bitrate
-            #     actual_bitrate = str(user_bitrate) + "k"
-            #
-            #     print_dashed_line()
-            #
-            # else:
-            #     print("Invalid Range For Bitrate... Defaulting to 192k")
-            #     actual_bitrate = "192k"
-            #
-            #     print_dashed_line()
+            # call the function to return the codec and bitrate to main program
+            file_format, current_codec, actual_bitrate = file_bitrate_checker()
             
-            print(f"<-- Converting to {user_format} -->\n\n")
+            print(f"<-- Converting to {file_format} -->\n\n")
 
             # call the function to convert to required audio format
             # convert_audio_format_single(output_path, user_format, actual_bitrate)
-            convert_audio_format(output_path, user_format, actual_bitrate, current_codec)
+            convert_audio_format(output_path, file_format, actual_bitrate, current_codec)
         
         elif user_option == "2":
             # user wants to convert YouTube links / videos with Text File
@@ -267,6 +239,8 @@ def audio_downloader():
                 # check for contents in the text file
                 check_file_size(text_file)
 
+                print("<-- Starting Downloading Process -->\n\n")
+
                 # if everything is correct start the downloading process
                 # command to execute from Python in shell
                 yt_dlp_cmd = [
@@ -282,29 +256,15 @@ def audio_downloader():
                 subprocess.run(yt_dlp_cmd)
 
                 print_dashed_line()
-                print("<-- Starting Conversion Process -->\n")
+                print("<-- Starting Conversion Process -->\n\n")
 
-                # prompt the user to enter file_format and bitrate
-                user_format = input("Please Select Between 'mp3' and 'wav': ")
-                user_bitrate = int(input("Please Enter Bit Rate ( 100 - 2000 ): "))
+                # call the function to return the codec and bitrate to main program
+                file_format, current_codec, actual_bitrate = file_bitrate_checker()
 
-                # perform check on bitrate
-                if (user_bitrate >= 100 and user_bitrate <= 2000):
-                    # everything is good... use user's bitrate
-                    actual_bitrate = str(user_bitrate) + "k"
-
-                    print_dashed_line()
-                
-                else:
-                    print("Invalid Range For Bitrate... Defaulting to 192k")
-                    actual_bitrate = "192k"
-
-                    print_dashed_line()
-
-                print(f"<-- Converting to {user_format} -->\n\n")
+                print(f"<-- Converting to {file_format} -->\n\n")
 
                 # call the function to convert to required audio format
-                convert_audio_format(output_path, user_format, actual_bitrate)
+                convert_audio_format(output_path, file_format, actual_bitrate, current_codec)
 
             else:
                 # user does not have 'yt_urls.txt' file present at `~/Desktop`
@@ -334,6 +294,7 @@ def audio_downloader():
 
 
 
+audio_downloader()
 
 
 
