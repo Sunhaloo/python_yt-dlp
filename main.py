@@ -1,5 +1,6 @@
 import os
 import subprocess
+import glob
 
 
 # function to display dashed lines
@@ -13,13 +14,12 @@ def print_dashed_line():
 # depending if downloading audio / video; will create folder with respective name
 def create_folder(user_option: str):
     # check for the user's option
-    if user_option == "text":
+    if user_option == "audio":
         # meaning user wants to download audio
-        dir_path = os.path.expanduser("~/Desktop/downloaded_audio_multi")
+        dir_path = os.path.expanduser("~/Desktop/downloaded_audio")
 
         # check if the path exists
         if os.path.exists(dir_path):
-            print_dashed_line()
             print("<-- Output Directory / Folder Already Exists! -->")
             print_dashed_line()
 
@@ -32,33 +32,12 @@ def create_folder(user_option: str):
             # os.mkdir(os.path.expanduser("~/Desktop/downloaded_audio"))
             os.mkdir(dir_path)
 
-    # BUG: No other options right now but to do this
-    elif user_option == "single":
-        # meaning user wants to download audio
-        dir_path = os.path.expanduser("~/Desktop/downloaded_audio_single")
-
-        # check if the path exists
-        if os.path.exists(dir_path):
-            print_dashed_line()
-            print("<-- Output Directory / Folder Already Exists! -->")
-            print_dashed_line()
-
-        # if the directory / folder does not exists
-        else:
-            print_dashed_line()
-            print("<-- Creating Output Folder -->")
-            print_dashed_line()
-            # create the directory / folder
-            # os.mkdir(os.path.expanduser("~/Desktop/downloaded_video"))
-            os.mkdir(dir_path)
-
     elif user_option == "video":
         # meaning user wants to download audio
         dir_path = os.path.expanduser("~/Desktop/downloaded_video")
 
         # check if the path exists
         if os.path.exists(dir_path):
-            print_dashed_line()
             print("<-- Output Directory / Folder Already Exists! -->")
             print_dashed_line()
 
@@ -129,9 +108,7 @@ def convert_audio_format_txt_file(directory_path: str, file_format: str, bitrate
     # change from the current working directory to where we downloaded the songs
     os.chdir(directory_path)
     # iterate through the whole directory / folder
-    for song in os.listdir():
-        # our input "file" for the ffmpeg input flag
-        input_song = song
+    for input_song in glob.glob("*.m4a"):
         # out output "file" for the ffmpeg output flag
         output_song = os.path.splitext(input_song)[0]
 
@@ -150,7 +127,7 @@ def convert_audio_format_txt_file(directory_path: str, file_format: str, bitrate
 
         # run the command from Python
         subprocess.run(ffmpeg_cmd)
-        # clean the non-convert file ==> with `.m4a` extension
+        # clean the non-converted file ==> with `.m4a` extension
         os.remove(input_song)
 
 
@@ -178,9 +155,7 @@ def convert_audio_format_single(directory_path: str, file_format: str, bitrate: 
     # change from current working directory to where we downloaded the song
     os.chdir(directory_path)
     # iterate through the whole directory / folder
-    for song in os.listdir():
-        # our input "file" for the ffmpeg input flag
-        input_song = song
+    for input_song in glob.glob("*.m4a"):
         # out output "file" for the ffmpeg output flag
         output_song = os.path.splitext(input_song)[0]
 
@@ -222,10 +197,10 @@ def audio_downloader():
             print_dashed_line()
 
             # call the function to create the output directory / folder
-            create_folder("single")
+            create_folder("audio")
 
             # variable to hold the output directory / path
-            output_path = os.path.expanduser("~/Desktop/downloaded_audio_single/")
+            output_path = os.path.expanduser("~/Desktop/downloaded_audio/")
             # variable to hold the output "filename" for the downloaded songs
             output_song_name = os.path.join(output_path + "%(title)s.%(ext)s")
 
@@ -233,6 +208,8 @@ def audio_downloader():
             # WARNING: Remember to write function to check if URL is valid
             yt_url = input("Please Enter YouTube URL to Convert: ")
 
+            print_dashed_line()
+            print("<-- Starting Downloading Process -->\n\n")
 
             # command to execute from Python in shell
             yt_dlp_cmd = [
@@ -242,13 +219,11 @@ def audio_downloader():
                     "-o", output_song_name
                 ]
 
-            print()
-
             # run the command from Python to the Terminal
             subprocess.run(yt_dlp_cmd)
 
             print_dashed_line()
-            print("<-- Starting Conversion Process -->\n")
+            print("<-- Starting Conversion Process -->\n\n")
 
             # prompt the user to enter file_format and bitrate
             user_format = input("Please Select Between 'mp3' and 'wav': ")
@@ -267,21 +242,23 @@ def audio_downloader():
 
                 print_dashed_line()
             
-            print(f"<-- Converting to {user_format} -->")
+            print(f"<-- Converting to {user_format} -->\n\n")
 
             # call the function to convert to required audio format
-            convert_audio_format_single(output_path, user_format, actual_bitrate)
+            # convert_audio_format_single(output_path, user_format, actual_bitrate)
+            convert_audio_format_txt_file(output_path, user_format, actual_bitrate)
         
         elif user_option == "2":
             # user wants to convert YouTube links / videos with Text File
             print_dashed_line()
             print("<-- Converting URLs from Text File -->")
+            print_dashed_line()
 
             # call the function to create the output directory
-            create_folder("text")
+            create_folder("audio")
 
             # variable to hold the output directory / path
-            output_path = os.path.expanduser("~/Desktop/downloaded_audio_multi/")
+            output_path = os.path.expanduser("~/Desktop/downloaded_audio/")
             # variable to hold the output "filename" for the downloaded songs
             output_song_name = os.path.join(output_path + "%(title)s.%(ext)s")
             # directory / path for our input file
@@ -307,8 +284,7 @@ def audio_downloader():
                 subprocess.run(yt_dlp_cmd)
 
                 print_dashed_line()
-                print("<-- Starting Conversion Process -->")
-                print_dashed_line()
+                print("<-- Starting Conversion Process -->\n")
 
                 # prompt the user to enter file_format and bitrate
                 user_format = input("Please Select Between 'mp3' and 'wav': ")
@@ -327,7 +303,7 @@ def audio_downloader():
 
                     print_dashed_line()
 
-                print(f"<-- Converting to {user_format} -->")
+                print(f"<-- Converting to {user_format} -->\n\n")
 
                 # call the function to convert to required audio format
                 convert_audio_format_txt_file(output_path, user_format, actual_bitrate)
