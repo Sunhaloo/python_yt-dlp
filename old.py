@@ -1,6 +1,6 @@
 import os
-import glob
 import subprocess
+import glob
 
 
 # function to display dashed lines
@@ -29,6 +29,7 @@ def create_folder(user_option: str):
             print("<-- Creating Output Folder -->")
             print_dashed_line()
             # create the directory / folder
+            # os.mkdir(os.path.expanduser("~/Desktop/downloaded_audio"))
             os.mkdir(dir_path)
 
     elif user_option == "video":
@@ -46,6 +47,7 @@ def create_folder(user_option: str):
             print("<-- Creating Output Folder -->")
             print_dashed_line()
             # create the directory / folder
+            # os.mkdir(os.path.expanduser("~/Desktop/downloaded_video"))
             os.mkdir(dir_path)
 
 
@@ -82,70 +84,26 @@ def check_file_size(file_path: str):
         print(f"File '{file_name}' Has NOT Been Found at Desktop!!!")
 
 
-# function to validate file_format and bitrate
-def file_bitrate_checker(file_format: str, bitrate: int):
-    # exception handling
-    try:
-        # evaluate the file format and codecs
-        if file_format == "mp3":
-            # use the appropriate codec for mp3
-            codec = "libmp3lame"
+# function to convert between audio formats
+# NOTE: to be used in conjunction with text file as input ==> searches for songs in directory
+def convert_audio_format_txt_file(directory_path: str, file_format: str, bitrate: str):
+    # evaluate the file format and codecs
+    if file_format == "mp3":
+        # use the appropriate codec for mp3
+        codec = "libmp3lame"
 
-        elif file_format == "wav":
-            # use the appropriate codec for wav
-            codec = "pcm_s16le"
+    elif file_format == "wav":
+        # use the appropriate codec for wav
+        codec = "pcm_s16le"
 
-        else:
-            # if the user enters something else
-            print_dashed_line()
-            print("<-- Invalid File Format Entered... Defaulting to MP3 and Using Default Bitrate -->")
-            file_format = "mp3"
-            codec = "libmp3lame"
+    else:
+        # if the user enters something else
+        print_dashed_line()
+        print("<-- Invalid File Format Entered... Defaulting to MP3 and Using Default Bitrate -->")
+        file_format = "mp3"
+        codec = "libmp3lame"
 
         print_dashed_line()
-
-        # perform check on bitrate
-        if (bitrate >= 100 and bitrate <= 2000):
-            # everything is good... use user's bitrate
-            actual_bitrate = str(bitrate) + "k"
-        
-            print_dashed_line()
-
-        else:
-            print("Invalid Range For Bitrate... Defaulting to 192k")
-            actual_bitrate = "192k"
-
-            print_dashed_line()
-
-        # return the codec and bitrate to main program
-        return codec, actual_bitrate
-
-    # if the user does not enter integer values for bitrate
-    except ValueError as e:
-        print(f"\nError: {e}")
-        print("Please Enter Integer Value for Bitrate\n")
-        return "libmp3lame", "192k"
-
-
-# function to convert between audio formats
-def convert_audio_format(directory_path: str, file_format: str, bitrate: str, codec: str):
-    # # evaluate the file format and codecs
-    # if file_format == "mp3":
-    #     # use the appropriate codec for mp3
-    #     codec = "libmp3lame"
-    #
-    # elif file_format == "wav":
-    #     # use the appropriate codec for wav
-    #     codec = "pcm_s16le"
-    #
-    # else:
-    #     # if the user enters something else
-    #     print_dashed_line()
-    #     print("<-- Invalid File Format Entered... Defaulting to MP3 and Using Default Bitrate -->")
-    #     file_format = "mp3"
-    #     codec = "libmp3lame"
-    #
-    # print_dashed_line()
 
     # change from the current working directory to where we downloaded the songs
     os.chdir(directory_path)
@@ -170,6 +128,53 @@ def convert_audio_format(directory_path: str, file_format: str, bitrate: str, co
         # run the command from Python
         subprocess.run(ffmpeg_cmd)
         # clean the non-converted file ==> with `.m4a` extension
+        os.remove(input_song)
+
+
+# function to convert between audio formats
+# NOTE: to be used with single URLs conversions
+def convert_audio_format_single(directory_path: str, file_format: str, bitrate: str):
+    # evaluate the file format and codecs
+    if file_format == "mp3":
+        # use the appropriate codec for mp3
+        codec = "libmp3lame"
+
+    elif file_format == "wav":
+        # use the appropriate codec for wav
+        codec = "pcm_s16le"
+
+    else:
+        # if the user enters something else
+        print_dashed_line()
+        print("<-- Invalid File Format Entered... Defaulting to MP3 and Using Default Bitrate -->")
+        file_format = "mp3"
+        codec = "libmp3lame"
+
+        print_dashed_line()
+
+    # change from current working directory to where we downloaded the song
+    os.chdir(directory_path)
+    # iterate through the whole directory / folder
+    for input_song in glob.glob("*.m4a"):
+        # out output "file" for the ffmpeg output flag
+        output_song = os.path.splitext(input_song)[0]
+
+        # create the ffmpeg command that will be run from Python
+        ffmpeg_cmd = [
+            "ffmpeg", 
+            "-i", input_song, 
+            "-vn", 
+            "-acodec", codec, 
+            "-ab", bitrate, 
+            "-ar", "44100", 
+            "-f", file_format,
+            "-y",
+            output_song
+        ]
+
+        # run the command from Python
+        subprocess.run(ffmpeg_cmd)
+        # clean the non-convert file ==> with `.m4a` extension
         os.remove(input_song)
 
 
@@ -224,27 +229,24 @@ def audio_downloader():
             user_format = input("Please Select Between 'mp3' and 'wav': ")
             user_bitrate = int(input("Please Enter Bit Rate ( 100 - 2000 ): "))
 
-            # TESTING: Testing file and bitrate checker
-            current_codec, actual_bitrate = file_bitrate_checker(user_format, user_bitrate)
-
             # perform check on bitrate
-            # if (user_bitrate >= 100 and user_bitrate <= 2000):
-            #     # everything is good... use user's bitrate
-            #     actual_bitrate = str(user_bitrate) + "k"
-            #
-            #     print_dashed_line()
-            #
-            # else:
-            #     print("Invalid Range For Bitrate... Defaulting to 192k")
-            #     actual_bitrate = "192k"
-            #
-            #     print_dashed_line()
+            if (user_bitrate >= 100 and user_bitrate <= 2000):
+                # everything is good... use user's bitrate
+                actual_bitrate = str(user_bitrate) + "k"
+            
+                print_dashed_line()
+
+            else:
+                print("Invalid Range For Bitrate... Defaulting to 192k")
+                actual_bitrate = "192k"
+
+                print_dashed_line()
             
             print(f"<-- Converting to {user_format} -->\n\n")
 
             # call the function to convert to required audio format
             # convert_audio_format_single(output_path, user_format, actual_bitrate)
-            convert_audio_format(output_path, user_format, actual_bitrate, current_codec)
+            convert_audio_format_txt_file(output_path, user_format, actual_bitrate)
         
         elif user_option == "2":
             # user wants to convert YouTube links / videos with Text File
@@ -304,7 +306,7 @@ def audio_downloader():
                 print(f"<-- Converting to {user_format} -->\n\n")
 
                 # call the function to convert to required audio format
-                convert_audio_format(output_path, user_format, actual_bitrate)
+                convert_audio_format_txt_file(output_path, user_format, actual_bitrate)
 
             else:
                 # user does not have 'yt_urls.txt' file present at `~/Desktop`
@@ -333,13 +335,14 @@ def audio_downloader():
 
 
 
+# function to display options to user
+def display_options():
+    # main welcome "screen" + display options to user
+    print("\n<-- YouTube Video Downloader and Converter -->\n")
+    print("Option [1]: Download Audio")
+    print("Option [2]: Download Video")
+    print("Option [x]: Exit")
+    print_dashed_line()
 
 
-
-
-
-
-
-
-
-
+audio_downloader()
