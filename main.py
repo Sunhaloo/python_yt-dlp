@@ -47,6 +47,14 @@ def create_folder(user_option: str):
             os.mkdir(dir_path)
 
 
+# function to check if YouTube URL is valid
+def check_yt_link(input: str):
+    print(input)
+    # NOTE: we can use something like `os.isfile()`
+    # so that we can differentiate between a single string and text file
+    # hence, we won't need to create a separeate function
+
+
 # function to check for the file size
 def check_file_size(file_path: str):
     # exception handling
@@ -235,6 +243,8 @@ def audio_downloader():
             if os.path.isfile(text_file) and os.path.exists(text_file):
                 # check for contents in the text file
                 check_file_size(text_file)
+
+                # WARNING: Remember to write function to check if URL is valid
 
                 print("<-- Starting Downloading Process -->\n\n")
 
