@@ -132,6 +132,98 @@ def check_file_size(file_path: str):
 
 # function to convert `.m4a` files to `.mp3`
 def convert_to_mp3(directory_path: str, bitrate: str):
+    # display the formats that we can convert to
+    print_dashed_line()
+    print("Select the Output Type")
+    print_dashed_line()
+
+    print("Option [1]: MP3 Format")
+    print("Option [2]: WAV Format")
+
+    # prompt the user to enter output format
+    user_format = input("Please Select Output File Format: ")
+    print_dashed_line()
+
+    # select the appropriate file format and code for ffmpeg command below
+    if user_format == "1":
+        # user wants to user to convert to mp3
+        file_format = "mp3"
+        codec = "libmp3lame"
+
+    elif user_format == "2":
+        # user wants to user to convert to wav
+        file_format = "wav"
+        codec = "pcm_s16le"
+    
+    # if user does not select something appropriate
+    else:
+        print_dashed_line()
+        print('Wrong Option')
+        print_dashed_line()
+
+    # change from current working directory to where we downloaded the songs
+    os.chdir(directory_path)
+    # iterate through the whole directory / folder
+    for song in os.listdir(directory_path):
+        # get each song's name
+        input_song = song
+        # find the name of the song without extension ( ==> NO `.m4a` )
+        output_song = os.path.splitext(input_song)[0]
+
+        # arguments to pass through ffmpeg
+        ffmpeg_cmd = [
+            "ffmpeg", 
+            "-i", input_song, 
+            "-vn", 
+            "-acodec", "libmp3lame", 
+            "-ab", bitrate, 
+            "-ar", "44100", 
+            "-f", "mp3",
+            "-y",
+            output_song
+            ]
+
+        # run command from Python
+        subprocess.run(ffmpeg_cmd)
+        # clean the `.m4a` file
+        os.remove(input_song)
+
+
+
+# function to convert `.m4a` files to `.mp3`
+def convert_to_mp32(directory_path: str):
+    # display the formats that we can convert to
+    print_dashed_line()
+    print("Select the Output Type")
+    print_dashed_line()
+
+    print("Option [1]: MP3 Format")
+    print("Option [2]: WAV Format")
+
+    # prompt the user to enter output format
+    user_format = input("Please Select Output File Format: ")
+    # prompt the user to enter the bitrate
+    user_bitrate = input("Please Enter Bitrate: ")
+    bitrate = user_bitrate + "k"
+    print_dashed_line()
+
+    # select the appropriate file format and code for ffmpeg command below
+    if user_format == "1":
+        # user wants to user to convert to mp3
+        file_format = "mp3"
+        codec = "libmp3lame"
+
+    elif user_format == "2":
+        # user wants to user to convert to wav
+        file_format = "wav"
+        codec = "pcm_s16le"
+    
+    # if user does not select something appropriate
+    else:
+        print_dashed_line()
+        print('Wrong Option')
+        print_dashed_line()
+
     # change from current working directory to where we downloaded the songs
     os.chdir(directory_path)
     # iterate through the whole directory / folder
