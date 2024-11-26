@@ -17,3 +17,18 @@
         - Kivy ( *works even on mobile $\Rightarrow$ Android and IOS* )
         - Qt
         - Flet ( *really cool but newer* )
+
+---
+
+- Download Video
+- Download Audio
+    - Download Single Links
+        - Allow user to choose:
+            - Format ( ==> mp3 and wav )
+            - Bit Rate
+        - Check if the URLs is valid ( separate function )
+    - Download with Text File
+        - Allow user to choose:
+            - Format ( ==> mp3 and wav )
+            - Bit Rate
+        - Check if the URLs is valid ( separate function ---> will need to open file for read )
