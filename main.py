@@ -48,8 +48,24 @@ def create_folder(user_option: str):
 
 
 # function to check if YouTube URL is valid
-def check_yt_link(input: str):
-    print(input)
+def check_yt_url(input: str):
+    # check if the input argument is a file or not
+    if os.path.isfile(input):
+        # open the file for read as "input" is a file
+        with open(input, 'r') as txt_file:
+            # place all the contents of the file in a list
+            file_content = txt_file.readlines()
+
+            # iterate through the list to check for anomalies
+            for line_number, url in enumerate(file_content):
+                print(f"{line_number + 1} ---> {url.strip()}")
+
+            # WARNING: need to learn Regex ( Regular Expressions ) for pattern  matching
+
+    else:
+        # input argument is NOT a file
+        print(input)
+
     # NOTE: we can use something like `os.isfile()`
     # so that we can differentiate between a single string and text file
     # hence, we won't need to create a separeate function
@@ -298,11 +314,8 @@ def audio_downloader():
         print(f"\nError: {e}")
         print("Please Enter Integer Data for Bitrate\n")
 
-
-
-
-
-
+# TESTING: testing the file part of the patten matching function that we are creating
+check_yt_url(os.path.expanduser("~/Desktop/yt_urls.txt"))
 
 
 
